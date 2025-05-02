@@ -1,0 +1,31 @@
+﻿@model List<ApplicationMessage.Models.Message>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var message in Model)
+    {
+        var isCurrentUser = message.SenderId == int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+        var isOnline = (DateTime.UtcNow - message.Sender.LastSeen).TotalMinutes < 5;
+
+        <div class="message @(isCurrentUser ? "sent" : "received")">
+
+            @if (!isCurrentUser)
+            {
+                <div class="status-wrapper @(isOnline ? "online" : "offline")" style="margin-right: 0.75rem;">
+                    <img src="@(message.Sender?.ProfilePicturePath ?? "/images/default-avatar.png")" alt="Profile" class="chat-avatar" />
+                    <span class="status-dot"></span>
+                </div>
+            }
+
+            <div class="bubble" style="padding: 1rem 1.25rem; font-size: 1rem; line-height: 1.6;">
+                <p style="margin-bottom: 0.3rem;">@message.Content</p>
+                <small style="font-size: 0.75rem; color: #adb5bd;">@message.Timestamp.ToLocalTime().ToString("HH:mm")</small>
+            </div>
+
+        </div>
+    }
+}
+else
+{
+    <p style="text-align: center; color: #6c757d; padding: 2rem;">No messages yet. Start the conversation!</p>
+}

@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem; text-align: center;">Create Account</h2>
+
+    <form method="post" asp-action="Register">
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required />
+
+        <button type="submit">Register</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1rem;">
+        Already have an account? <a href="/Account/Login">Login</a>
+    </div>
+</div>

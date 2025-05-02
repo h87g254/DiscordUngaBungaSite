@@ -1,0 +1,1 @@
+Server=(localdb)\\mssqllocaldb;Database=aspnet-ApplicationMessage-ceb9776c-6ecb-4867-b2ed-7d784205602f;Trusted_Connection=True;MultipleActiveResultSets=true
