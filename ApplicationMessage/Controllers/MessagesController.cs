@@ -38,6 +38,10 @@ namespace ApplicationMessage.Controllers
         [HttpPost]
         public async Task<IActionResult> SendMessage(int receiverId, string content)
         {
+            if (receiverId > _context.Users.Max(u => u.Id))
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (string.IsNullOrWhiteSpace(content))
             {
                 return RedirectToAction("Chat", new { userId = receiverId });
