@@ -43,6 +43,11 @@ namespace ApplicationMessage.Controllers
                 return RedirectToAction("Chat", new { userId = receiverId });
             }
 
+            if(receiverId > _context.Users.Max(u => u.Id))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
 
             var message = new Message

@@ -6,14 +6,6 @@
 
 <div class="container">
 
-    <!-- Search bar -->
-    <div class="card">
-        <form method="get" asp-action="Index">
-            <input type="text" name="search" placeholder="Search users..." value="@(Context.Request.Query["search"])" />
-            <button type="submit">Search</button>
-        </form>
-    </div>
-
     <!-- Friends -->
     <div class="card">
         <h2 style="margin-bottom: 1rem;">Friends</h2>
@@ -47,36 +39,6 @@
         }
     </div>
 
-    <!-- Search Results -->
-    <div class="card">
-        <h2 style="margin-bottom: 1rem;">
-            @(string.IsNullOrEmpty(Context.Request.Query["search"]) ? "All Users" : "Search Results")
-        </h2>
-        @if (Model.AllUsers != null && Model.AllUsers.Any())
-        {
-            @foreach (var user in Model.AllUsers)
-            {
-                var online = (DateTime.UtcNow - user.LastSeen).TotalMinutes < 5;
-                <div class="user-card">
-                    <div class="status-wrapper @(online ? "online" : "offline")">
-                        <img src="@(user.ProfilePicturePath ?? "/images/default-avatar.png")" alt="Profile" />
-                        <span class="status-dot"></span>
-                    </div>
-                    <span>@user.Username</span>
-
-                    <form method="post" asp-action="AddFriend">
-                        <input type="hidden" name="userId" value="@user.Id" />
-                        <button type="submit">Add Friend</button>
-                    </form>
-                </div>
-            }
-        }
-        else
-        {
-            <p>No users found.</p>
-        }
-    </div>
-
     <!-- Pending Requests -->
     <div class="card">
         <h2 style="margin-bottom: 1rem;">Pending Friend Requests</h2>
@@ -106,4 +68,41 @@
         }
     </div>
 
+    <!-- Search bar -->
+    <div class="card">
+        <form method="get" asp-action="Index">
+            <input type="text" name="search" placeholder="Search users..." value="@(Context.Request.Query["search"])" />
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    <div class="card">
+        <h2 style="margin-bottom: 1rem;">
+            @(string.IsNullOrEmpty(Context.Request.Query["search"]) ? "All Users" : "Search Results")
+        </h2>
+        @if (Model.AllUsers != null && Model.AllUsers.Any())
+        {
+            @foreach (var user in Model.AllUsers)
+            {
+                var online = (DateTime.UtcNow - user.LastSeen).TotalMinutes < 5;
+                <div class="user-card">
+                    <div class="status-wrapper @(online ? "online" : "offline")">
+                        <img src="@(user.ProfilePicturePath ?? "/images/default-avatar.png")" alt="Profile" />
+                        <span class="status-dot"></span>
+                    </div>
+                    <span>@user.Username</span>
+
+                    <form method="post" asp-action="AddFriend">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <button type="submit">Add Friend</button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No users found.</p>
+        }
+    </div>
 </div>

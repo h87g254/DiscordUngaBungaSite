@@ -3,6 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
 }
 
 html, body {
@@ -55,6 +56,7 @@ html, body {
 
         .nav a:hover {
             color: #4051db;
+            text-decoration: underline;
         }
 
 /* ========== Cards ========== */
@@ -70,6 +72,12 @@ html, body {
     .card:hover {
         transform: translateY(-5px);
     }
+
+.card, .box {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+}
 
 /* ========== User Cards ========== */
 .user-card {

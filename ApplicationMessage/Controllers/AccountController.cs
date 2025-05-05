@@ -22,7 +22,7 @@ namespace ApplicationMessage.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            ViewData["Title"] = "Регистрация";
+            ViewData["Title"] = "Register";
             return View();
         }
 
@@ -31,19 +31,19 @@ namespace ApplicationMessage.Controllers
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
-                ModelState.AddModelError("", "Всички полета са задължителни.");
+                ModelState.AddModelError("", "Fullfil all fields.");
                 return View();
             }
 
             if (await _context.Users.AnyAsync(u => u.Username == username))
             {
-                ModelState.AddModelError("", "Потребителското име вече съществува.");
+                ModelState.AddModelError("", "Username is not unique.");
                 return View();
             }
 
             if (await _context.Users.AnyAsync(u => u.Email == email))
             {
-                ModelState.AddModelError("", "Имейл вече е използван.");
+                ModelState.AddModelError("", "Email already used.");
                 return View();
             }
 
@@ -51,7 +51,8 @@ namespace ApplicationMessage.Controllers
             {
                 Username = username,
                 Email = email,
-                PasswordHash = PasswordHasher.HashPassword(password)
+                PasswordHash = PasswordHasher.HashPassword(password),
+                ProfilePicturePath = "/profile_pictures/default.png"
             };
 
             _context.Users.Add(user);
@@ -63,7 +64,7 @@ namespace ApplicationMessage.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            ViewData["Title"] = "Вход";
+            ViewData["Title"] = "Login";
             return View();
         }
 
@@ -72,14 +73,14 @@ namespace ApplicationMessage.Controllers
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                ModelState.AddModelError("", "Всички полета са задължителни.");
+                ModelState.AddModelError("", " All fields are required.");
                 return View();
             }
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user == null || !PasswordHasher.VerifyPassword(password, user.PasswordHash))
             {
-                ModelState.AddModelError("", "Невалидно потребителско име или парола.");
+                ModelState.AddModelError("", "Username and password not valid.");
                 return View();
             }
 
@@ -107,7 +108,7 @@ namespace ApplicationMessage.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("MyCookieAuth");
-            return RedirectToAction("Login");
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -164,6 +165,12 @@ namespace ApplicationMessage.Controllers
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
+                }
+                var permittedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+                if (!permittedTypes.Contains(profilePicture.ContentType))
+                {
+                    ModelState.AddModelError("ProfilePicture", "Only image files are allowed.");
+                    return RedirectToAction("Index");
                 }
 
                 var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(profilePicture.FileName)}";

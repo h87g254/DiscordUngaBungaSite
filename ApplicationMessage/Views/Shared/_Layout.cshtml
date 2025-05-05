@@ -15,21 +15,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MyApp</title>
+    <title>@ViewData["Title"] - Vibble</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
 </head>
 <body>
     <header class="header">
         <div class="container">
-            <a href="/" class="button-link">MyApp</a>
             <nav class="nav" style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
                 @if (User.Identity.IsAuthenticated)
                 {
                     <a href="/Home/Index">Home</a>
                     <a href="/Account/Profile" style="display: flex; align-items: center;">
-                        <img src="@(ViewBag.CurrentUserProfilePicture ?? "/images/default-avatar.png")" alt="Profile" class="chat-avatar" style="width: 32px; height: 32px; margin-right: 0.5rem;" />
-                        Profile
+                        <img src="@(ViewBag.CurrentUserProfilePicture ?? "/images/default-avatar.png")" alt="Profile" class="chat-avatar" style="width: 80px; height: 80px; margin-right: 0.5rem;" />
                     </a>
                     <a href="/Account/Logout">Logout</a>
                 }
@@ -49,7 +47,7 @@
 
     <footer class="footer">
         <div class="container">
-            &copy; 2025 MyApp. All rights reserved.
+            &copy; 2025 Vibble. All rights reserved.
         </div>
     </footer>
     <script src="/js/updateLastSeen.js"></script>
