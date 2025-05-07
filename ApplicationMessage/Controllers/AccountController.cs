@@ -108,7 +108,7 @@ namespace ApplicationMessage.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("MyCookieAuth");
-            return RedirectToAction("Index");
+            return RedirectToAction("Login");
         }
 
         [HttpPost]
