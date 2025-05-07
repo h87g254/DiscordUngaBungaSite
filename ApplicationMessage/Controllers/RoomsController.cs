@@ -41,6 +41,7 @@ namespace ApplicationMessage.Controllers
         [HttpPost]
         public IActionResult Create(string roomName, string roomDescription)
         {
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
             if (string.IsNullOrWhiteSpace(roomName))
             {
                 TempData["Error"] = "Room name is required.";
@@ -50,7 +51,8 @@ namespace ApplicationMessage.Controllers
             var room = new ChatRoom
             {
                 RoomName = roomName,
-                RoomDescription = roomDescription ?? ""
+                RoomDescription = roomDescription ?? "",
+                OwnerId = userId
             };
             _context.ChatRooms.Add(room);
             _context.SaveChanges();

@@ -5,9 +5,7 @@
     @foreach (var message in Model)
     {
         var isCurrentUser = message.SenderId == int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
-        var isOnline = true;
-        if(message.Sender != null)
-             isOnline = (DateTime.UtcNow - message.Sender.LastSeen).TotalMinutes < 5;
+        var isOnline = (DateTime.UtcNow - message.Sender.LastSeen).TotalMinutes < 5;
              
         <div class="message @(isCurrentUser ? "sent" : "received")">
 
