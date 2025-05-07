@@ -91,8 +91,7 @@ namespace ApplicationMessage.Controllers
 
             return PartialView("_MessagesPartial", messages);
         }
-
-        [Authorize]
+        [HttpGet]
         public IActionResult RoomChat(int roomId)
         {
             var room = _context.ChatRooms.FirstOrDefault(r => r.Id == roomId);
@@ -117,7 +116,6 @@ namespace ApplicationMessage.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public IActionResult SendRoomMessage(int roomId, string content)
         {
             if (string.IsNullOrWhiteSpace(content))
