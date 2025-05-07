@@ -56,3 +56,25 @@
 
     </div>
 </div>
+@section Scripts
+{
+    <script>
+        function scrollMessagesToBottom() {
+            const messagesDiv = document.getElementById('messages');
+            if (messagesDiv) {
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
+
+        async function refreshMessages() {
+            const roomId = @ViewBag.RoomId;
+            const response = await fetch('/Messages/GetRoomMessages?roomId=' + roomId);
+            const html = await response.text();
+            document.getElementById('messages').innerHTML = html;
+            scrollMessagesToBottom();
+        }
+
+        setInterval(refreshMessages, 5000);
+        window.onload = scrollMessagesToBottom;
+    </script>
+}

@@ -77,6 +77,20 @@ namespace ApplicationMessage.Controllers
 
             return PartialView("_MessagesPartial", messages);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetRoomMessages(int roomId)
+        {
+            var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+
+            var messages = await _context.Messages
+                .Include(m=> m.Sender)
+                .Where(m => m.ChatRoomId == roomId)
+                .OrderBy(m => m.Timestamp)
+                .ToListAsync();
+
+
+            return PartialView("_MessagesPartial", messages);
+        }
 
         [Authorize]
         public IActionResult RoomChat(int roomId)
@@ -90,10 +104,11 @@ namespace ApplicationMessage.Controllers
             ViewBag.OwnerId = room.OwnerId;
             ViewBag.RoomId = room.Id;
             ViewBag.RoomName = room.RoomName;
-
+            
 
 
             var messages = _context.Messages
+                .Include(m => m.Sender)
                 .Where(m => m.ChatRoomId == roomId)
                 .OrderBy(m => m.Timestamp)
                 .ToList();
@@ -115,6 +130,7 @@ namespace ApplicationMessage.Controllers
             var message = new Message
             {
                 SenderId = userId,
+                ReceiverId = userId,
                 Content = content,
                 Timestamp = DateTime.UtcNow,
                 ChatRoomId = roomId

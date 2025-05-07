@@ -11,7 +11,6 @@ namespace ApplicationMessage.Models
         [Required]
         public int SenderId { get; set; }
 
-        [Required]
         public int ReceiverId { get; set; }
 
         [Required]
