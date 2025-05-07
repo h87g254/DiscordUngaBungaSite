@@ -26,8 +26,9 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <a href="/Home/Index">Home</a>
+                    <a href="/Rooms/Index" class="button-link">Rooms</a>
                     <a href="/Account/Profile" style="display: flex; align-items: center;">
-                        <img src="@(ViewBag.CurrentUserProfilePicture ?? "/images/default-avatar.png")" alt="Profile" class="chat-avatar" style="width: 80px; height: 80px; margin-right: 0.5rem;" />
+                        <img src="@(ViewBag.CurrentUserProfilePicture ?? "/images/default-avatar.png")" alt="Profile" class="chat-avatar" style="width: 80px; height: 80px;" />
                     </a>
                     <a href="/Account/Logout">Logout</a>
                 }

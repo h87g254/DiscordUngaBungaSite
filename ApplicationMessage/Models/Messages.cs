@@ -22,6 +22,10 @@ namespace ApplicationMessage.Models
 
         public User Sender { get; set; }
         public User Receiver { get; set; }
+
+        public int? ChatRoomId { get; set; }
+        public ChatRoom ChatRoom { get; set; }
+
     }
 
 }

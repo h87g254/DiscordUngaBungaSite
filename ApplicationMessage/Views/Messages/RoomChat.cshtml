@@ -1,0 +1,58 @@
+﻿@model List<ApplicationMessage.Models.Message>
+
+@{
+    ViewData["Title"] = "Room Chat";
+}
+
+<div class="container">
+
+    @if (ViewBag.OwnerId == int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value))
+    {
+        <div class="card">
+            <h3>Invite a user</h3>
+            <form method="post" asp-action="SendRoomInvite">
+                <input type="hidden" name="roomId" value="@ViewBag.RoomId" />
+                <input type="text" name="search" placeholder="Search username or ID" />
+                <button type="submit">Search</button>
+            </form>
+
+            @if (ViewBag.SearchResults != null)
+            {
+                foreach (var user in ViewBag.SearchResults)
+                {
+                    <div>
+                        <span>@user.Username</span>
+                        <form method="post" asp-action="SendRoomInviteToUser">
+                            <input type="hidden" name="roomId" value="@ViewBag.RoomId" />
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit">Invite</button>
+                        </form>
+                    </div>
+                }
+            }
+        </div>
+    }
+
+
+    <div class="card" style="max-width: 900px; margin: 0 auto; padding: 0;">
+
+        <!-- Chat Header -->
+        <div style="padding: 1.5rem 2rem; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 1.5rem;">@ViewBag.RoomName</h2>
+            <a href="/Rooms/Index" class="button-link">← Back to Rooms</a>
+        </div>
+
+        <!-- Messages Scrollable Area -->
+        <div id="messages" style="padding: 1.5rem 2rem; background: #f1f3f5; max-height: 550px; overflow-y: auto;">
+            @await Html.PartialAsync("_MessagesPartial", Model)
+        </div>
+
+        <!-- Message Input Bar -->
+        <form method="post" asp-action="SendRoomMessage" style="display: flex; align-items: center; padding: 1rem 2rem; border-top: 1px solid #dee2e6; background: #fff;">
+            <input type="hidden" name="roomId" value="@ViewBag.RoomId" />
+            <input type="text" name="content" placeholder="Type your message..." required style="flex: 1; padding: 0.75rem 1rem; font-size: 1rem; border-radius: 10px; border: 1px solid #ced4da;" />
+            <button type="submit" style="padding: 0.6rem 1.2rem; font-size: 0.95rem; background-color: #5865f2; color: white; border: none; border-radius: 10px; width: auto;">Send</button>
+        </form>
+
+    </div>
+</div>

@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Chat Rooms";
+}
+
+<div class="container">
+
+    <div class="card">
+        <h2>My Rooms</h2>
+        @if (ViewBag.MyRooms != null && ViewBag.MyRooms.Count > 0)
+        {
+            foreach (var room in ViewBag.MyRooms)
+            {
+                <div class="user-card">
+                    <span style="font-weight: 600;">@room.RoomName</span>
+                    <form method="get" asp-controller="Messages" asp-action="RoomChat">
+                        <input type="hidden" name="roomId" value="@room.Id" />
+                        <button type="submit">Enter</button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <p>You are not in any rooms yet.</p>
+        }
+    </div>
+
+    <div class="card">
+        <h2>All Rooms</h2>
+        @if (ViewBag.AllRooms != null && ViewBag.AllRooms.Count > 0)
+        {
+            foreach (var room in ViewBag.AllRooms)
+            {
+                <div class="user-card">
+                    <span style="font-weight: 600;">@room.RoomName</span>
+                    <form method="get" asp-action="Join">
+                        <input type="hidden" name="roomId" value="@room.Id" />
+                        <button type="submit">Join</button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No available rooms. Create one below!</p>
+        }
+    </div>
+
+    <div class="card">
+        <h2>Create a New Room</h2>
+        <form method="post" asp-action="Create">
+            <input type="text" name="roomName" placeholder="Room Name" required />
+            <input type="text" name="roomDescription" placeholder="Description (optional)" />
+            <button type="submit">Create Room</button>
+        </form>
+    </div>
+
+</div>

@@ -55,6 +55,13 @@ namespace ApplicationMessage.Controllers
                     .Where(f => f.AddresseeId == currentUserId && !f.IsAccepted)
                     .Include(f => f.Requester)
                     .ToListAsync();
+                var pendingRoomInvites = await _context.RoomInvites
+                    .Where(r => r.ToUserId == currentUserId && !r.IsAccepted)
+                    .Include(r => r.Room)
+                    .ToListAsync();
+
+                ViewBag.PendingRoomInvites = pendingRoomInvites;
+
 
                 var model = new HomeViewModel
                 {
@@ -62,6 +69,17 @@ namespace ApplicationMessage.Controllers
                     AllUsers = allUsers,
                     PendingRequests = pendingRequests
                 };
+
+                var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+
+                var myRooms = _context.UserChatRooms
+                    .Include(uc => uc.ChatRoom)
+                    .Where(uc => uc.UserId == userId)
+                    .Select(uc => uc.ChatRoom)
+                    .ToList();
+
+                ViewBag.MyRooms = myRooms;
+
 
                 return View(model);
             }
@@ -127,6 +145,26 @@ namespace ApplicationMessage.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public IActionResult AcceptRoomInvite(int inviteId)
+        {
+            var invite = _context.RoomInvites.Include(i => i.Room).FirstOrDefault(i => i.Id == inviteId);
+
+            if (invite != null && !invite.IsAccepted)
+            {
+                invite.IsAccepted = true;
+
+                _context.UserChatRooms.Add(new UserChatRoom
+                {
+                    ChatRoomId = invite.RoomId,
+                    UserId = invite.ToUserId
+                });
+
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
+        }
 
 
     }

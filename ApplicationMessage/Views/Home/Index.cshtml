@@ -39,6 +39,29 @@
         }
     </div>
 
+    <!-- Rooms -->
+    <div class="card">
+        <h2>My Groups / Rooms</h2>
+        @if (ViewBag.MyRooms != null && ViewBag.MyRooms.Count > 0)
+        {
+            foreach (var room in ViewBag.MyRooms)
+            {
+                <div class="user-card">
+                    <span style="font-weight: 600;">@room.RoomName</span>
+                    <form method="get" asp-controller="Messages" asp-action="RoomChat">
+                        <input type="hidden" name="roomId" value="@room.Id" />
+                        <button type="submit">Enter</button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <p>You are not in any rooms yet. <a href="/Rooms/Index">Find or create rooms</a>.</p>
+        }
+    </div>
+
+
     <!-- Pending Requests -->
     <div class="card">
         <h2 style="margin-bottom: 1rem;">Pending Friend Requests</h2>
@@ -67,6 +90,28 @@
             <p>No pending requests.</p>
         }
     </div>
+
+    <div class="card">
+        <h2>Pending Room Invites</h2>
+        @if (ViewBag.PendingRoomInvites != null && ViewBag.PendingRoomInvites.Count > 0)
+        {
+            foreach (var invite in ViewBag.PendingRoomInvites)
+            {
+                <div>
+                    <span>Invite to @invite.Room.RoomName</span>
+                    <form method="post" asp-action="AcceptRoomInvite">
+                        <input type="hidden" name="inviteId" value="@invite.Id" />
+                        <button type="submit">Accept</button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No pending room invites.</p>
+        }
+    </div>
+
 
     <!-- Search bar -->
     <div class="card">
