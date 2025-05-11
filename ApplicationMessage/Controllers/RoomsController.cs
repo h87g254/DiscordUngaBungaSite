@@ -34,7 +34,7 @@ namespace ApplicationMessage.Controllers
             ViewBag.MyRooms = myRooms;
             ViewBag.AllRooms = allRooms;
 
-            return View("Rooms");
+            return View("~/Views/Rooms/Rooms.cshtml");
         }
 
         // Create a new room
@@ -45,7 +45,7 @@ namespace ApplicationMessage.Controllers
             if (string.IsNullOrWhiteSpace(roomName))
             {
                 TempData["Error"] = "Room name is required.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Rooms");
             }
 
             var room = new ChatRoom

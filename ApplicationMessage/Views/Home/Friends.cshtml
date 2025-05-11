@@ -1,0 +1,79 @@
+﻿@model ApplicationMessage.Models.HomeViewModel
+    @{
+    ViewData["Title"] = "Friends";
+    }
+
+    <div class="container">
+
+        <!-- Friends List -->
+        <div class="card">
+            <h2 style="margin-bottom: 1rem;">Friends</h2>
+            @if (Model.Friends != null && Model.Friends.Any())
+        {
+            foreach (var friend in Model.Friends)
+            {
+                var online = (DateTime.UtcNow - friend.LastSeen).TotalMinutes < 5;
+            <div class="user-card">
+                <div class="status-wrapper @(online ? "online" : "offline")">
+                    <img src="@(friend.ProfilePicturePath ?? "/images/default-avatar.png")" alt="Profile" class="profile-picture" />
+                    <span class="status-dot"></span>
+                </div>
+                <span>@friend.Username</span>
+
+                <form method="get" asp-controller="Messages" asp-action="Chat">
+                    <input type="hidden" name="userId" value="@friend.Id" />
+                    <button type="submit">Chat</button>
+                </form>
+
+                <form method="post" asp-action="RemoveFriend">
+                    <input type="hidden" name="friendId" value="@friend.Id" />
+                    <button type="submit">Remove</button>
+                </form>
+            </div>
+            }
+        }
+        else
+        {
+            <p>No friends yet.</p>
+        }
+        </div>
+
+        <!-- Search bar -->
+        <div class="card">
+            <form method="get" asp-action="Index">
+                <input type="text" name="search" placeholder="Search users..." value="@(Context.Request.Query["search"])" />
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <!-- Search Results -->
+        <div class="card">
+            <h2 style="margin-bottom: 1rem;">
+                @(string.IsNullOrEmpty(Context.Request.Query["search"]) ? "All Users" : "Search Results")
+            </h2>
+            @if (Model.AllUsers != null && Model.AllUsers.Any())
+        {
+            foreach (var user in Model.AllUsers)
+            {
+                var online = (DateTime.UtcNow - user.LastSeen).TotalMinutes < 5;
+            <div class="user-card">
+                <div class="status-wrapper @(online ? "online" : "offline")">
+                    <img src="@(user.ProfilePicturePath ?? "/images/default-avatar.png")" alt="Profile" class="profile-picture" />
+                    <span class="status-dot"></span>
+                </div>
+                <span>@user.Username</span>
+
+                <form method="post" asp-action="AddFriend">
+                    <input type="hidden" name="userId" value="@user.Id" />
+                    <button type="submit">Add Friend</button>
+                </form>
+            </div>
+            }
+        }
+        else
+        {
+            <p>No users found.</p>
+        }
+        </div>
+
+    </div>

@@ -144,6 +144,8 @@ namespace ApplicationMessage.Controllers
 
         [HttpPost]
         [Authorize]
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> UpdateProfile(string username, IFormFile profilePicture)
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -161,16 +163,25 @@ namespace ApplicationMessage.Controllers
 
             if (profilePicture != null && profilePicture.Length > 0)
             {
+                var permittedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+                const long maxFileSize = 5 * 1024 * 1024; 
+
+                if (!permittedTypes.Contains(profilePicture.ContentType))
+                {
+                    ModelState.AddModelError("ProfilePicture", "Only JPG, PNG, GIF, or WEBP images are allowed.");
+                    return RedirectToAction("Profile");
+                }
+
+                if (profilePicture.Length > maxFileSize)
+                {
+                    ModelState.AddModelError("ProfilePicture", "File size cannot exceed 2MB.");
+                    return RedirectToAction("Profile");
+                }
+
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_pictures");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
-                }
-                var permittedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
-                if (!permittedTypes.Contains(profilePicture.ContentType))
-                {
-                    ModelState.AddModelError("ProfilePicture", "Only image files are allowed.");
-                    return RedirectToAction("Index");
                 }
 
                 var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(profilePicture.FileName)}";
@@ -188,6 +199,7 @@ namespace ApplicationMessage.Controllers
 
             return RedirectToAction("Profile");
         }
+
 
 
     }

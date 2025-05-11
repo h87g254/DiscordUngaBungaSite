@@ -1,0 +1,57 @@
+﻿
+
+@{
+    ViewData["Title"] = "Pending Requests";
+}
+
+<div class="container">
+    <div class="card">
+        <h2 style="margin-bottom: 1rem;">Pending Friend Requests</h2>
+
+    @if (ViewBag.PendingFriends != null && ViewBag.PendingFriends.Count > 0)
+    {
+        foreach (var fr in ViewBag.PendingFriends)
+        {
+                var user = fr.Requester;
+                var online = (DateTime.UtcNow - user.LastSeen).TotalMinutes < 5;
+                <div class="user-card">
+                    <div class="status-wrapper @(online ? "online" : "offline")">
+                        <img src="@(user.ProfilePicturePath ?? "/images/default-avatar.png")" alt="Profile" class=" profile-picture"/>
+                        <span class="status-dot"></span>
+                    </div>
+                    <span>@user.Username</span>
+
+                    <form method="post" asp-action="AcceptFriend">
+                        <input type="hidden" name="friendshipId" value="@fr.Id" />
+                        <button type="submit">Accept</button>
+                    </form>
+                </div>
+        }
+    }
+    else
+    {
+        <p>No pending friend requests.</p>
+    }
+    </div>
+
+    <div class="card">
+        <h2>Pending Room Invites</h2>
+    @if (ViewBag.PendingRoomInvites != null && ViewBag.PendingRoomInvites.Count > 0)
+    {
+        foreach (var invite in ViewBag.PendingRoomInvites)
+        {
+                <div>
+                    <span>Invite to @invite.Room.RoomName</span>
+                    <form method="post" asp-action="AcceptRoomInvite">
+                        <input type="hidden" name="inviteId" value="@invite.Id" />
+                        <button type="submit">Accept</button>
+                    </form>
+                </div>
+        }
+    }
+    else
+    {
+        <p>No pending group invites.</p>
+    }
+    </div>
+</div>

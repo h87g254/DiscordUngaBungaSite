@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ApplicationMessage.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApplicationMessage.Controllers
 {
@@ -16,76 +17,54 @@ namespace ApplicationMessage.Controllers
 
         public async Task<IActionResult> Index(string search)
         {
-            if (User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
+                return View(new HomeViewModel());
+
+            if (!string.IsNullOrEmpty(search))
+                return RedirectToAction("Friends", new { search = search });
+
+            // Старото поведение за Index без търсене
+            var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+
+            var friends = await _context.Friendships
+                .Where(f => (f.RequesterId == currentUserId || f.AddresseeId == currentUserId) && f.IsAccepted)
+                .Select(f => f.RequesterId == currentUserId ? f.AddresseeId : f.RequesterId)
+                .ToListAsync();
+
+            var friendUsers = await _context.Users
+                .Where(u => friends.Contains(u.Id))
+                .ToListAsync();
+
+            var pendingRequests = await _context.Friendships
+                .Where(f => f.AddresseeId == currentUserId && !f.IsAccepted)
+                .Include(f => f.Requester)
+                .ToListAsync();
+
+            var pendingRoomInvites = await _context.RoomInvites
+                .Where(r => r.ToUserId == currentUserId && !r.IsAccepted)
+                .Include(r => r.Room)
+                .ToListAsync();
+
+            ViewBag.PendingRoomInvites = pendingRoomInvites;
+
+            var model = new HomeViewModel
             {
-                var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+                Friends = friendUsers,
+                AllUsers = new List<User>(),
+                PendingRequests = pendingRequests
+            };
 
-                var friends = await _context.Friendships
-                    .Where(f => (f.RequesterId == currentUserId || f.AddresseeId == currentUserId) && f.IsAccepted)
-                    .Select(f => f.RequesterId == currentUserId ? f.AddresseeId : f.RequesterId)
-                    .ToListAsync();
+            var myRooms = _context.UserChatRooms
+                .Include(uc => uc.ChatRoom)
+                .Where(uc => uc.UserId == currentUserId)
+                .Select(uc => uc.ChatRoom)
+                .ToList();
 
-                var friendUsers = await _context.Users
-                    .Where(u => friends.Contains(u.Id))
-                    .ToListAsync();
+            ViewBag.MyRooms = myRooms;
 
-                List<User> allUsers = new List<User>();
-
-                if (!string.IsNullOrEmpty(search))
-                {
-                    if (int.TryParse(search, out int idSearch))
-                    {
-                        // Search by ID (exact match)
-                        allUsers = await _context.Users
-                            .Where(u => u.Id == idSearch && u.Id != currentUserId && !friends.Contains(u.Id))
-                            .ToListAsync();
-                    }
-                    else
-                    {
-                        // Search by Username (contains, case insensitive)
-                        allUsers = await _context.Users
-                            .Where(u => u.Id != currentUserId && !friends.Contains(u.Id))
-                            .Where(u => u.Username.ToLower().Contains(search.ToLower()))
-                            .ToListAsync();
-                    }
-                }
-
-
-                var pendingRequests = await _context.Friendships
-                    .Where(f => f.AddresseeId == currentUserId && !f.IsAccepted)
-                    .Include(f => f.Requester)
-                    .ToListAsync();
-                var pendingRoomInvites = await _context.RoomInvites
-                    .Where(r => r.ToUserId == currentUserId && !r.IsAccepted)
-                    .Include(r => r.Room)
-                    .ToListAsync();
-
-                ViewBag.PendingRoomInvites = pendingRoomInvites;
-
-
-                var model = new HomeViewModel
-                {
-                    Friends = friendUsers,
-                    AllUsers = allUsers,
-                    PendingRequests = pendingRequests
-                };
-
-                var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
-
-                var myRooms = _context.UserChatRooms
-                    .Include(uc => uc.ChatRoom)
-                    .Where(uc => uc.UserId == userId)
-                    .Select(uc => uc.ChatRoom)
-                    .ToList();
-
-                ViewBag.MyRooms = myRooms;
-
-
-                return View(model);
-            }
-
-            return View(new HomeViewModel());
+            return View(model);
         }
+
 
 
         [HttpPost]
@@ -110,7 +89,7 @@ namespace ApplicationMessage.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Friends");
         }
 
         [HttpPost]
@@ -124,7 +103,7 @@ namespace ApplicationMessage.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Pending");
         }
 
         [HttpPost]
@@ -142,7 +121,7 @@ namespace ApplicationMessage.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Friends");
         }
 
         [HttpPost]
@@ -163,8 +142,78 @@ namespace ApplicationMessage.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Pending");
         }
+
+        [Authorize]
+        public async Task<IActionResult> Pending()
+        {
+            var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+
+            var pendingFriends = await _context.Friendships
+                .Where(f => f.AddresseeId == currentUserId && !f.IsAccepted)
+                .Include(f => f.Requester)
+                .ToListAsync();
+
+            var pendingRooms = await _context.RoomInvites
+                .Where(r => r.ToUserId == currentUserId && !r.IsAccepted)
+                .Include(r => r.Room)
+                .ToListAsync();
+
+            ViewBag.PendingFriends = pendingFriends;
+            ViewBag.PendingRoomInvites = pendingRooms;
+
+            return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Friends(string? search)
+        {
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+
+            var friendsQuery = _context.Friendships
+                .Where(f => f.IsAccepted &&
+                    (f.RequesterId == userId || f.AddresseeId == userId))
+                .Include(f => f.Requester)
+                .Include(f => f.Addressee);
+
+            var friends = await friendsQuery.ToListAsync();
+
+            var friendList = friends.Select(f =>
+                f.RequesterId == userId ? f.Addressee : f.Requester
+            ).ToList();
+
+            List<User> allUsers = new();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var friendIds = friendList.Select(u => u.Id).ToList();
+
+                if (int.TryParse(search, out int idSearch))
+                {
+                    allUsers = await _context.Users
+                        .Where(u => u.Id == idSearch && u.Id != userId && !friendIds.Contains(u.Id))
+                        .ToListAsync();
+                }
+                else
+                {
+                    allUsers = await _context.Users
+                        .Where(u => u.Id != userId && !friendIds.Contains(u.Id))
+                        .Where(u => u.Username.ToLower().Contains(search.ToLower()))
+                        .ToListAsync();
+                }
+            }
+
+            var model = new HomeViewModel
+            {
+                Friends = friendList,
+                AllUsers = allUsers
+            };
+
+            return View("Friends", model);
+        }
+
+
 
 
     }
