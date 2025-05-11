@@ -22,10 +22,10 @@
         <form method="post" asp-action="SendMessage" style="display: flex; align-items: center; padding: 1rem 2rem; gap: 0.75rem; border-top: 1px solid #dee2e6; background: #fff;">
             <input type="hidden" name="receiverId" value="@ViewBag.ChatUserId" />
 
-            <input type="text" name="content" placeholder="Type your message..." required
+            <input id="messageInput" type="text" name="content" placeholder="Type your message..." required
                    style="flex: 1; min-width: 0; padding: 0.75rem 1rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ced4da; color: #212529; background: white;" />
 
-            <button type="submit" style="padding: 0.6rem 1.2rem; width: auto; font-size: 1rem; background-color: #5865f2; color: #ffffff; border: none; border-radius: 8px; white-space: nowrap;">
+            <button id="sendButton" type="submit" style="padding: 0.6rem 1.2rem; width: auto; font-size: 1rem; background-color: #5865f2; color: #ffffff; border: none; border-radius: 8px; white-space: nowrap;">
                 Send
             </button>
         </form>
@@ -53,4 +53,36 @@
         setInterval(refreshMessages, 5000);
         window.onload = scrollMessagesToBottom;
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
+
+        connection.on("ReceivePrivateMessage", async (user, message) => {
+            const response = await fetch('/Messages/GetMessages?userId=' + @ViewBag.ChatUserId);
+            const html = await response.text();
+            document.getElementById("messages").innerHTML = html;
+            document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+        });
+
+        connection.start().catch(err => console.error(err));
+
+        document.getElementById("sendButton").addEventListener("click", async function (e) {
+            e.preventDefault();
+            const content = document.getElementById("messageInput").value;
+            const receiverId = @ViewBag.ChatUserId;
+
+            if (!content.trim()) return;
+
+            await fetch('/Messages/SendMessage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `receiverId=${receiverId}&content=${encodeURIComponent(content)}`
+            });
+
+            document.getElementById("messageInput").value = "";
+        });
+    </script>
+
 }

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using ApplicationMessage.Data;
 using ApplicationMessage.Models;
 using Microsoft.AspNetCore.Authorization;
+using ApplicationMessage.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ApplicationMessage.Controllers
 {
@@ -10,10 +12,12 @@ namespace ApplicationMessage.Controllers
     public class MessagesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public MessagesController(ApplicationDbContext context)
+        public MessagesController(ApplicationDbContext context, IHubContext<ChatHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -58,6 +62,9 @@ namespace ApplicationMessage.Controllers
 
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.Group($"user_{receiverId}")
+                .SendAsync("ReceivePrivateMessage", User.Identity.Name, content);
 
             return RedirectToAction("Chat", new { userId = receiverId });
         }
@@ -136,6 +143,9 @@ namespace ApplicationMessage.Controllers
 
             _context.Messages.Add(message);
             _context.SaveChanges();
+
+            _hubContext.Clients.Group($"room_{roomId}")
+                .SendAsync("ReceiveRoomMessage", User.Identity.Name, content);
 
             return RedirectToAction("RoomChat", new { roomId });
         }
