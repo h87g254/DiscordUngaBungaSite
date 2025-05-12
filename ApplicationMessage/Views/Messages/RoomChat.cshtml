@@ -19,13 +19,13 @@
         </div>
 
         <!-- Input Bar -->
-        <form id="chatForm" style="display: flex; align-items: center; padding: 1rem 2rem; gap: 0.75rem; border-top: 1px solid #dee2e6; background: #fff;">
+        <form id="chatForm" asp-action="SendRoomMessage" asp-route-roomId="@ViewBag.RoomId" method="post" style="display: flex;  align-items: center; padding: 1rem 2rem; gap: 0.75rem; border-top: 1px solid #dee2e6; background: #fff;">
             <input type="hidden" id="receiverId" value="@ViewBag.ChatUserId" />
 
             <input id="messageInput" type="text" placeholder="Type your message..." required
                    style="flex: 1; min-width: 0; padding: 0.75rem 1rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ced4da; color: #212529; background: white;" />
 
-            <button id="sendButton" type="submit" style="padding: 0.6rem 1.2rem; width: auto; font-size: 1rem; background-color: #5865f2; color: #ffffff; border: none; border-radius: 8px; white-space: nowrap;">
+            <button id="sendButton" type="submit"  style="padding: 0.6rem 1.2rem; width: auto; font-size: 1rem; background-color: #5865f2; color: #ffffff; border: none; border-radius: 8px; white-space: nowrap;">
                 Send
             </button>
         </form>
@@ -38,7 +38,6 @@
     <script>
         const roomId = @ViewBag.RoomId;
         const messagesDiv = document.getElementById("messages");
-        const input = document.querySelector('input[name="content"]');
 
         function scrollMessagesToBottom() {
             if (messagesDiv) {
@@ -61,17 +60,11 @@
 
         connection.start().catch(err => console.error(err));
 
-        document.querySelector('form[method="post"][asp-action="SendRoomMessage"]')?.addEventListener("submit", async function (e) {
+                document.getElementById("sendButton").addEventListener("click", async function (e) {
             e.preventDefault();
-
-            const content = input.value;
+            const content = document.getElementById("messageInput").value;
 
             if (!content.trim()) return;
-
-            const msgDiv = document.createElement("div");
-            msgDiv.innerHTML = `<div style="text-align: right; margin-top: 5px;"><span style="display: inline-block; background: #5865f2; color: white; padding: 0.5rem 1rem; border-radius: 12px;">${content}</span></div>`;
-            messagesDiv.appendChild(msgDiv);
-            scrollMessagesToBottom();
 
             await fetch('/Messages/SendRoomMessage', {
                 method: 'POST',
@@ -79,7 +72,7 @@
                 body: `roomId=${roomId}&content=${encodeURIComponent(content)}`
             });
 
-            input.value = "";
+            document.getElementById("messageInput").value = "";
         });
     </script>
 }

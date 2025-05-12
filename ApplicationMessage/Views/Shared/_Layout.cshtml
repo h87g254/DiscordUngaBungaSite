@@ -25,20 +25,24 @@
         <aside class="sidebar">
             <div class="sidebar-profile">
                 <a href="/Account/Profile">
-                    <img src="@(ViewBag.CurrentUserProfilePicture ?? "/images/default.png")" class="sidebar-avatar" />
+                    <img src="@(ViewBag.CurrentUserProfilePicture ?? "/profile_pictures/default.png")" class="sidebar-avatar" />
                 </a>
                 <span class="sidebar-username">@User.Identity?.Name</span>
             </div>
 
-            <nav class="sidebar-nav">
-                <a href="/Home/Friends" class="sidebar-link">👥 Friends</a>
-                <a href="/Home/Pending" class="sidebar-link">📥 Pending</a>
-                <a href="/Rooms" class="sidebar-link">💬 Groups</a>
-            </nav>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <nav class="sidebar-nav">
+                    <a href="/Home/Friends" class="sidebar-link">👥 Friends</a>
+                    <a href="/Home/Pending" class="sidebar-link">📥 Pending</a>
+                    <a href="/Rooms" class="sidebar-link">💬 Groups</a>
+                </nav>
 
-            <form method="post" action="/Account/Logout" class="sidebar-logout">
-                <button type="submit">🚪 Logout</button>
-            </form>
+                <form method="post" action="/Account/Logout" class="sidebar-logout">
+                    <button type="submit">🚪 Logout</button>
+                </form>
+            }
+
         </aside>
 
         <!-- Main content -->

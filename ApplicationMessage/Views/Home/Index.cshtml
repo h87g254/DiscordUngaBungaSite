@@ -3,9 +3,20 @@
     var userName = User.Identity?.Name ?? "Guest";
 }
 
-<div class="container" style="display: flex; justify-content: center; align-items: center; height: 70vh;">
+<div class="container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 70vh;">
+
+    <!-- Welcome Card -->
     <div class="card" style="text-align: center; max-width: 500px; width: 100%;">
         <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: #5865f2;">Welcome,</h1>
         <h2 style="font-size: 2rem; font-weight: 700; color: #2c2f33;">@userName</h2>
     </div>
+
+    <!-- Login/Register Buttons (only for guests) -->
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div style="margin-top: 1.5rem; text-align: center;">
+            <a href="/Account/Login" class="button-link" style="margin: 0.25rem;">🔐 Login</a>
+            <a href="/Account/Register" class="button-link" style="margin: 0.25rem;">📝 Register</a>
+        </div>
+    }
 </div>
