@@ -16,7 +16,7 @@ html, body {
 .profile-picture {
     width: 80px;
     height: 80px;
-    object-fit: contain; /* allow gif animation */
+    object-fit: cover; /* allow gif animation */
     border-radius: 50%;
     border: 2px solid #dee2e6;
     image-rendering: auto;
@@ -326,7 +326,7 @@ form[action="/Messages/SendMessage"] {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    object-fit: contain; /* important for GIFs to loop naturally */
+    object-fit: cover; /* important for GIFs to loop naturally */
     margin-bottom: 0.5rem;
     border: 2px solid #5865f2;
     image-rendering: auto; /* ensures crisp playback */
@@ -475,11 +475,13 @@ form[action="/Messages/SendMessage"] {
     .chat-avatar {
         width: 32px;
         height: 32px;
+        object-fit: cover;
     }
 
     .profile-picture {
         width: 64px;
         height: 64px;
+        object-fit: cover;
     }
 
     .user-card span {
@@ -511,6 +513,7 @@ form[action="/Messages/SendMessage"] {
     .sidebar-avatar {
         width: 64px;
         height: 64px;
+        object-fit: cover;
     }
 
     .sidebar-link {
