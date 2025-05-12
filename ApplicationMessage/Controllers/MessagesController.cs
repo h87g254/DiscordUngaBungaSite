@@ -5,6 +5,7 @@ using ApplicationMessage.Models;
 using Microsoft.AspNetCore.Authorization;
 using ApplicationMessage.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using System.Threading.Tasks;
 
 namespace ApplicationMessage.Controllers
 {
@@ -123,9 +124,9 @@ namespace ApplicationMessage.Controllers
         }
 
         [HttpPost]
-        public IActionResult SendRoomMessage(int roomId, string content)
+        public async Task<IActionResult> SendRoomMessage(int roomId, string content)
         {
-            if (string.IsNullOrWhiteSpace(content))
+            if (string.IsNullOrWhiteSpace(content) || content.Length > 1000)
             {
                 return RedirectToAction("RoomChat", new { roomId });
             }
@@ -144,10 +145,10 @@ namespace ApplicationMessage.Controllers
             _context.Messages.Add(message);
             _context.SaveChanges();
 
-            _hubContext.Clients.Group($"room_{roomId}")
+            await _hubContext.Clients.Group($"room_{roomId}")
                 .SendAsync("ReceiveRoomMessage", User.Identity.Name, content);
 
-            return RedirectToAction("RoomChat", new { roomId });
+            return Ok();
         }
 
         [HttpPost]
