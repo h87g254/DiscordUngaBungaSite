@@ -34,6 +34,7 @@
             {
                 <nav class="sidebar-nav">
                     <a href="/Home/Friends" class="sidebar-link">👥 Friends</a>
+                    @await Component.InvokeAsync("RecentChats")
                     <a href="/Home/Pending" class="sidebar-link">📥 Pending</a>
                     <a href="/Rooms" class="sidebar-link">💬 Groups</a>
                 </nav>

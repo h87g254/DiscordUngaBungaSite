@@ -12,10 +12,10 @@
         {
             foreach (var friend in Model.Friends)
             {
-                var online = (DateTime.UtcNow - friend.LastSeen).TotalMinutes < 5;
+                var online = (DateTime.UtcNow - friend.LastSeen).TotalMinutes < 1;
             <div class="user-card">
                 <div class="status-wrapper @(online ? "online" : "offline")">
-                    <img src="@(friend.ProfilePicturePath ?? "/images/default-avatar.png")" alt="Profile" class="profile-picture" />
+                    <img src="@(friend.ProfilePicturePath ?? "/profile-pictures/default.png")" alt="Profile" class="profile-picture" />
                     <span class="status-dot"></span>
                 </div>
                 <span>@friend.Username</span>

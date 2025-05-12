@@ -1,0 +1,22 @@
+﻿@model List<ApplicationMessage.Models.User>
+
+@if (User.Identity.IsAuthenticated && Model.Any())
+{
+    <div class="sidebar-nav" style="margin: 1rem 0;">
+        @foreach (var user in Model)
+        {
+            var online = (DateTime.UtcNow - user.LastSeen).TotalMinutes < 1;
+            var avatarUrl = string.IsNullOrEmpty(user.ProfilePicturePath)
+                ? "/profile-pictures/default.png"
+                : user.ProfilePicturePath;
+
+            <a href="/Messages/Chat?userId=@user.Id" class="sidebar-link" style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="status-wrapper @(online ? "online" : "offline")">
+                    <img src="@avatarUrl" class="profile-picture" style="width: 36px; height: 36px;" />
+                    <div class="status-dot"></div>
+                </div>
+                <span style="font-size: 0.95rem;">@user.Username</span>
+            </a>
+        }
+    </div>
+}
