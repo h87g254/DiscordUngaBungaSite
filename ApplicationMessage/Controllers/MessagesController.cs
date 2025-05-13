@@ -67,7 +67,10 @@ namespace ApplicationMessage.Controllers
             await _hubContext.Clients.Group($"user_{receiverId}")
                 .SendAsync("ReceivePrivateMessage", User.Identity.Name, content);
 
-            return RedirectToAction("Chat", new { userId = receiverId });
+            await _hubContext.Clients.Group($"user_{currentUserId}")
+    .SendAsync("ReceivePrivateMessage", User.Identity.Name, content);
+
+            return Ok();
         }
 
         [HttpGet]
