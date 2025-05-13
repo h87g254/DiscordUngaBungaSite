@@ -34,36 +34,29 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <script>
+        const messagesDiv = document.getElementById('messages');
+        const userId = @ViewBag.ChatUserId;
+
         function scrollMessagesToBottom() {
-            const messagesDiv = document.getElementById('messages');
             if (messagesDiv) {
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
         }
 
-        async function refreshMessages() {
-            const userId = @ViewBag.ChatUserId;
-            const response = await fetch('/Messages/GetMessages?userId=' + userId);
-            const html = await response.text();
-            document.getElementById('messages').innerHTML = html;
-            scrollMessagesToBottom();
-        }
 
-        setInterval(refreshMessages, 5000);
         window.onload = scrollMessagesToBottom;
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-    <script>
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/chathub")
             .build();
 
         connection.on("ReceivePrivateMessage", async (user, message) => {
-            const response = await fetch('/Messages/GetMessages?userId=' + @ViewBag.ChatUserId);
+            const response = await fetch('/Messages/GetMessages?userId=' + userId);
             const html = await response.text();
-            document.getElementById("messages").innerHTML = html;
-            document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+            messagesDiv.innerHTML = html;
+            scrollMessagesToBottom();
         });
 
         connection.start().catch(err => console.error(err));
