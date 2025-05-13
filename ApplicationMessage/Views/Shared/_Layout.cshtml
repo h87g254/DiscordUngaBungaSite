@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="/css/site.css" />
 </head>
 <body>
+    <button id="sidebarToggle" class="mobile-toggle">☰</button>
+
     <div class="layout-wrapper">
 
         <!-- Sidebar -->
@@ -53,5 +55,23 @@
     </div>
 
     @RenderSection("Scripts", required: false)
+    <script>
+        const toggleButton = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        toggleButton?.addEventListener('click', () => {
+            sidebar?.classList.toggle('visible');
+        });
+
+        // Optional: hide sidebar when clicking a sidebar link (mobile only)
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar?.classList.remove('visible');
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
