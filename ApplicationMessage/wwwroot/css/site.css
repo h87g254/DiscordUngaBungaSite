@@ -424,14 +424,29 @@ form[action="/Messages/SendMessage"] {
 .mobile-toggle {
     display: none; /* hide by default */
 }
-
+img[name="sign"] {
+    display: block;
+    margin: auto;
+    height: 35vw;
+}
+h1[name="mes"] {
+    text-align: center;
+    font-size: 5vw;
+    color: red;
+}
 
 @media (max-width: 768px) {
     html, body {
         font-size: 16px;
         overflow-x: hidden;
     }
-
+    img[name="sign"] {
+        height: 120vw;
+    }
+    h1[name="mes"] {
+        margin-top:38%;
+        font-size:11vw;
+    }
     .container {
         padding: 1rem 0.5rem;
         width: 100%;

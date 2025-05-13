@@ -24,6 +24,10 @@ namespace ApplicationMessage.Controllers
         [HttpGet]
         public async Task<IActionResult> Chat(int userId)
         {
+            if (userId > _context.Users.Max(u => u.Id) || userId < 1)
+            {
+                return RedirectToAction("Error", "Home");
+            }
             var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
 
             // Взимаме всички съобщения между двамата
@@ -42,11 +46,11 @@ namespace ApplicationMessage.Controllers
 
         [HttpPost]
         public async Task<IActionResult> SendMessage(int receiverId, string content)
-        {
+        {/*
             if (receiverId > _context.Users.Max(u => u.Id) || receiverId < 1)
             {
-                return RedirectToAction("Index", "Home");
-            }
+                return Json(new { redirect = Url.Action("Error", "Home") });
+            }*/
             if (string.IsNullOrWhiteSpace(content))
             {
                 return RedirectToAction("Chat", new { userId = receiverId });
@@ -68,9 +72,9 @@ namespace ApplicationMessage.Controllers
                 .SendAsync("ReceivePrivateMessage", User.Identity.Name, content);
 
             await _hubContext.Clients.Group($"user_{currentUserId}")
-    .SendAsync("ReceivePrivateMessage", User.Identity.Name, content);
-
+                .SendAsync("ReceivePrivateMessage", User.Identity.Name, content);
             return Ok();
+            //return Json(new { success = true });
         }
 
         [HttpGet]
@@ -105,6 +109,10 @@ namespace ApplicationMessage.Controllers
         [HttpGet]
         public IActionResult RoomChat(int roomId)
         {
+            if(roomId > _context.ChatRooms.Max(r => r.Id) || roomId < 1)
+            {
+                return RedirectToAction("Error", "Home");
+            }
             var room = _context.ChatRooms.FirstOrDefault(r => r.Id == roomId);
 
             if (room == null)

@@ -215,6 +215,9 @@ namespace ApplicationMessage.Controllers
 
 
 
-
+        public IActionResult Error()
+        {
+            return View(); 
+        }
     }
 }
