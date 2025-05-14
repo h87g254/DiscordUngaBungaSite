@@ -109,10 +109,10 @@ namespace ApplicationMessage.Controllers
         [HttpGet]
         public IActionResult RoomChat(int roomId)
         {
-            if(roomId > _context.ChatRooms.Max(r => r.Id) || roomId < 1)
+            /*if(roomId > _context.ChatRooms.Max(r => r.Id) || roomId < 1)
             {
                 return RedirectToAction("Error", "Home");
-            }
+            }*/
             var room = _context.ChatRooms.FirstOrDefault(r => r.Id == roomId);
 
             if (room == null)
