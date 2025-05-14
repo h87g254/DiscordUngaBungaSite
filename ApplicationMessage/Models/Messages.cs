@@ -25,6 +25,9 @@ namespace ApplicationMessage.Models
         public int? ChatRoomId { get; set; }
         public ChatRoom ChatRoom { get; set; }
 
+        public string? ImagePath { get; set; }
+
+
     }
 
 }

@@ -77,6 +77,9 @@ namespace ApplicationMessage.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ReceiverId")
                         .HasColumnType("INTEGER");
 
