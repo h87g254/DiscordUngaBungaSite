@@ -169,8 +169,6 @@ namespace ApplicationMessage.Controllers
 
         [HttpPost]
         [Authorize]
-        [HttpPost]
-        [Authorize]
         public async Task<IActionResult> UpdateProfile(string username, IFormFile profilePicture)
         {
             try

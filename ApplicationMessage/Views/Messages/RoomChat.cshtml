@@ -24,7 +24,7 @@
 
             <input id="messageInput" type="text" placeholder="Type your message..." required
                    style="flex: 1; min-width: 0; padding: 0.75rem 1rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ced4da; color: #212529; background: white;" />
-
+            <input id="imageFile" type="file" name="image" accept="image/*" style="max-width: 120px;" />
             <button id="sendButton" type="submit"  style="padding: 0.6rem 1.2rem; width: auto; font-size: 1rem; background-color: #5865f2; color: #ffffff; border: none; border-radius: 8px; white-space: nowrap;">
                 Send
             </button>
@@ -66,10 +66,19 @@
 
             if (!content.trim()) return;
 
+            const fileInput = document.getElementById('imageFile');
+
+            const formData = new FormData();
+            formData.append('roomId', roomId);
+            formData.append('content', content);
+
+            if (fileInput.files.length > 0 && fileInput.files[0]) {
+                formData.append('image', fileInput.files[0]);
+            }
+
             await fetch('/Messages/SendRoomMessage', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `roomId=${roomId}&content=${encodeURIComponent(content)}`
+                body: formData
             });
 
             document.getElementById("messageInput").value = "";

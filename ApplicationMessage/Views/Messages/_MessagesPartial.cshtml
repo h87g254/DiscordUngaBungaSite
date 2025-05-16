@@ -16,14 +16,12 @@
                     <span class="status-dot"></span>
                 </div>
             }
-
             <div class="bubble" style="padding: 1rem 1.25rem; font-size: 1rem; line-height: 1.6;">
                 <p style="margin-bottom: 0.3rem;">@message.Content</p>
                 @if (!string.IsNullOrEmpty(message.ImagePath))
                 {
                     <img src="@message.ImagePath" alt="Image" style="max-width: 250px; border-radius: 12px; margin-top: 0.5rem;" />
                 }
-
                 <small style="font-size: 0.75rem; color: #adb5bd;">@message.Timestamp.ToLocalTime().ToString("HH:mm")</small>
             </div>
 

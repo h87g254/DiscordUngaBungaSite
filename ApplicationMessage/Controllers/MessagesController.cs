@@ -61,6 +61,11 @@ namespace ApplicationMessage.Controllers
 
                 if (image != null && image.Length > 0)
                 {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
                     var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
                     var filePath = Path.Combine("wwwroot/uploads", fileName);
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -70,7 +75,9 @@ namespace ApplicationMessage.Controllers
 
                     imagePath = "/uploads/" + fileName;
                 }
-
+                else { 
+                    
+                }
                 if (string.IsNullOrWhiteSpace(content) && imagePath == null)
                     return RedirectToAction("Chat", new { userId = receiverId });
 
@@ -179,7 +186,7 @@ namespace ApplicationMessage.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendRoomMessage(int roomId, string content)
+        public async Task<IActionResult> SendRoomMessage(int roomId, string content,IFormFile image)
         {
             try
             {
@@ -187,7 +194,30 @@ namespace ApplicationMessage.Controllers
                 {
                     return RedirectToAction("RoomChat", new { roomId });
                 }
+                string imagePath = null;
 
+                if (image != null && image.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+                    var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                    var filePath = Path.Combine("wwwroot/uploads", fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(stream);
+                    }
+
+                    imagePath = "/uploads/" + fileName;
+                }
+                else
+                {
+
+                }
+                if (string.IsNullOrWhiteSpace(content) && imagePath == null)
+                    return RedirectToAction("RoomChat", new { roomId });
                 var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
 
                 var message = new Message
@@ -196,7 +226,9 @@ namespace ApplicationMessage.Controllers
                     ReceiverId = userId,
                     Content = content,
                     Timestamp = DateTime.UtcNow,
-                    ChatRoomId = roomId
+                    ChatRoomId = roomId,
+                    ImagePath = imagePath
+
                 };
 
                 _context.Messages.Add(message);
