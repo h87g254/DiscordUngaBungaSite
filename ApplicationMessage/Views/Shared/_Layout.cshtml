@@ -29,7 +29,7 @@
                 <a href="/Account/Profile">
                     <img src="@(ViewBag.CurrentUserProfilePicture ?? "/profile_pictures/default.png")" class="sidebar-avatar" />
                 </a>
-                <span class="sidebar-username">@User.Identity?.Name</span>
+                @* <span class="sidebar-username">@User.Identity?.Name</span> *@
             </div>
 
             @if (User.Identity.IsAuthenticated)
